@@ -1,26 +1,47 @@
-import React from 'react';
+import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
+import routes from './routes'
+import style from './Components/styles/Main.scss' 
+import {connect} from 'react-redux'
+import {getSession, registerUser} from './Redux/reducers/userReducer'
+import {withRouter} from 'react-router-dom'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+//components
+import Login from './Components/Login'
+import Register from './Components/Register'
+import Nav from './Components/Nav'
+
+class App extends Component {
+
+  componentDidMount(){
+    this.props.getSession()
+  }
+
+  render(){
+    let content;
+    if (!this.props.user_id && this.props.location.pathname == "/"){
+      content = <Login/>
+    }else if (!this.props.user_id && this.props.location.pathname =="/register"){
+      content =<Register/>
+    }else if (this.props.user_id){
+      content = <div ><Nav/>{routes}</div>
+    }
+    return (
+      <div className="App">
+        {content}
+      </div>
+    );
+  }
 }
 
-export default App;
+const mapStateToProps = reduxState =>{
+  return {
+    user_id: reduxState.userReducer.user_id
+  }
+}
+
+
+export default withRouter(connect(mapStateToProps, {
+  getSession
+})(App))
